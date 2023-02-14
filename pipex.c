@@ -25,6 +25,9 @@ void create_fds(t_ppx *ppx, char *argv[]) {
 
     if (ppx->in < 0 || ppx->out < 0) {
         printf("%s\n", "Error occurred while executing the file");
+        free(ppx->cmd_path);
+        free(ppx->cmd_args);
+        free(ppx);
         exit(EXIT_FAILURE);
     }
 }
@@ -54,7 +57,11 @@ void save_path_value(t_ppx *ppx, char *envp[]) {
     }
 
     if (search_path == 1) {
+
         printf("%s\n", "Error accessing a variable PATH");
+        free(ppx->cmd_path);
+        free(ppx->cmd_args);
+        free(ppx);
         exit(EXIT_FAILURE);
     }
 
