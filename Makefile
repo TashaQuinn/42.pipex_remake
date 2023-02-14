@@ -31,4 +31,6 @@ re: fclean all
 .PHONY: all clean fclean re
 
 val:
-	valgrind --leak-check=full --show-leak-kinds=all -s ./$(NAME)
+	valgrind --show-leak-kinds=all -s ./$(NAME) 
+
+# input.txt "grep -i lol" "wc -l" output.txt
