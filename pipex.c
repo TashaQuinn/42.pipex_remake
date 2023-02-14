@@ -8,12 +8,12 @@ void last_free(t_ppx *ppx) {
 
 	while (i < 2)
 		free(ppx->cmd_path[i++]);
-	free(ppx->cmd_path);
+	//gifree(ppx->cmd_path);
 
 	i = 0;
 	while (ppx->cmd_args[i])
 		free_array(ppx->cmd_args[i++]);
-	free(ppx->cmd_args);
+	//free(ppx->cmd_args);
 
 	//free(ppx);
 }
