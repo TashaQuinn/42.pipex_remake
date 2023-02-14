@@ -5,17 +5,21 @@ void last_free(t_ppx *ppx) {
     int	i = 0;
 
 	free_array(ppx->value_splitted);
+    ppx->value_splitted = NULL;
 
 	while (i < 2)
 		free(ppx->cmd_path[i++]);
 	free(ppx->cmd_path);
+    ppx->cmd_path = NULL;
 
 	i = 0;
-	while (ppx->cmd_args[i])
+	while (i < 2)
 		free_array(ppx->cmd_args[i++]);
 	free(ppx->cmd_args);
+    ppx->cmd_args = NULL;
 
 	free(ppx);
+    ppx = NULL;
 }
 
 void create_fds(t_ppx *ppx, char *argv[]) {
@@ -93,12 +97,19 @@ void access_check(t_ppx *ppx, char *argv[]) {
             printf("%s\n", "Invalid command!");
         
             free_array(ppx->value_splitted);
+            ppx->value_splitted = NULL;
+
+            if (*(ppx->cmd_path) != NULL)
+                free_array(ppx->cmd_path);
+            ppx->cmd_path = NULL;
 
             while (i >= 0)
 				free_array(ppx->cmd_args[i--]);
             free(ppx->cmd_args);
+            ppx->cmd_args = NULL;
 
             free(ppx);
+            ppx = NULL;
 
             exit(EXIT_FAILURE);
         }

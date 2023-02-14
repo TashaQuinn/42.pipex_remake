@@ -15,8 +15,6 @@ typedef struct s_ppx {
 	char	***cmd_args;
 	int		in;
 	int		out;
-	//char	**envp;
-	//int		argc;
 
 }	t_ppx;
 

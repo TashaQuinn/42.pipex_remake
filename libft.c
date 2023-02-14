@@ -2,33 +2,34 @@
 
 // https://csnotes.medium.com/pipex-tutorial-42-project-4469f5dd5901 pipex tutorial
 
-size_t	ft_strlen(const char *str) {
+void ft_bzero(void *s, size_t n) {
 
-	int i = 0;
-
-	while (str[i])
-		i++;
-
-	return i;
-}
-
-void	ft_bzero(void *s, size_t n) {
-
-	char *str = (char *)s;
+	char *string = (char *)s;
 
 	for (size_t i = 0; i < n; i++)
-		str[i] = '\0';
+		string[i] = '\0';
 }
 
-void *ft_calloc(size_t number, size_t size) {
+void *ft_calloc(size_t n, size_t size) {
 
-	void *memory = malloc(number * size);
-	if (!(memory))
+	void *res = malloc(size * n);
+
+	if (!res)
 		return NULL;
 
-	ft_bzero(memory, (number * size));
+	ft_bzero(res, size * n);
 
-	return memory;
+	return res;
+}
+
+size_t ft_strlen(const char *str) {
+
+	size_t len = 0;
+
+	while (str[len])
+		len++;
+
+	return len;
 }
 
 char *ft_substr(char const *s, unsigned int start, size_t len) {
@@ -57,103 +58,92 @@ char *ft_substr(char const *s, unsigned int start, size_t len) {
 	return res;
 }
 
+static size_t ft_count_words(char const *str, char c) {
 
-static size_t ft_count_words(char const *s, char c) {
+	size_t	words = 0, i = 0;
 
-	size_t count = 0;
+	while (str[i]) {
 
-	while (*s) {
+		while (str[i] == c)
+			i++;
 
-		while (*s == c)
-			s++;
-		if (*s != c && *s)
-			count++;
-		while (*s != c && *s)
-			s++;
+		if (str[i] != c && str[i] != '\0')
+			words++;
+
+		while (str[i] != c && str[i] != '\0')
+			i++;
+	}
+
+	return words;
+}
+
+static size_t ft_counts_len_word(char const *str, char c) {
+
+	size_t count = 0, i = 0;
+
+	while (str[i] == c)
+		i++;
+
+	while (str[i] != c && str[i] != '\0') {
+		count++;
+		i++;
 	}
 
 	return count;
 }
 
-void ft_free_memory(char **memory) {
+static void ft_free_memory(char	**array) {
 
-	for (int i = 0; memory[i]; i++) 
-		free(memory[i]);
+	for (size_t i = 0; array[i]; i++)
+		free(array[i]);
 
-	free(memory);
-}
-
-size_t ft_word_len(const char *str, char c) {
-
-	int	i = 0;
-
-	while (*str == c)
-		str++;
-
-	while (*str && *str != c) {
-		i++;
-		str++;
-	}
-
-	return i;
-}
-
-char **ft_pre_split(char const *s, char c) {
-
-	if (!s)
-		return NULL;
-
-	size_t i = ft_count_words(s, c);
-	char **str = ft_calloc(i + 1, sizeof(char *));
-
-	if (str == NULL)
-		return NULL;
-
-	size_t j = 0;
-	while (i > j) {
-
-		while (*s == c)
-			s++;
-
-		str[j] = ft_substr(s, 0, ft_word_len(s, c));
-
-		if (str[j++] == NULL) {
-			ft_free_memory(str);
-			return NULL;
-		}
-
-		s += ft_word_len(s, c);
-	}
-
-	str[j] = NULL;
-
-	return str;
+	free(array);
 }
 
 char **ft_split(char const *s, char c) {
 
+	size_t i = 0;
+
 	if (!s)
-		return NULL;
+		return (NULL);
 
-	char **str = ft_pre_split(s, c);
+	size_t words = ft_count_words((char *)s, c);
 
-	if (!str)
-		return NULL;
+	char **array = (char **)malloc(sizeof(char *) * (words + 1));
+	if (!array)
+		return (NULL);
 
-	return str;
+	while (i < words) {
+
+		while (*s == c)
+			s++;
+
+		array[i] = ft_substr(s, 0, ft_counts_len_word(s, c));
+
+		if (!array[i++]) {
+			ft_free_memory(array);
+			return NULL;
+		}
+
+		s += ft_counts_len_word(s, c);
+	}
+
+	array[i] = NULL;
+	return array;
 }
+
 
 /*..............................................................................................................*/
 
 char *ft_strjoin(char const *s1, char c, char const *s2) {
 
-	size_t i = 0, j = 0;
+	size_t	i = 0, j = 0;
 
 	int len = (ft_strlen(s1) + ft_strlen(s2) + 2);
-
 	char *string = (char *)malloc(sizeof(char) * len);
+
 	if (!string)
-		return NULL;
+		return 0;
 
 	while (i < ft_strlen(s1)) {
 		string[i] = s1[i];
@@ -162,14 +152,11 @@ char *ft_strjoin(char const *s1, char c, char const *s2) {
 
 	string[i++] = c;
 
-	while (j < ft_strlen(s2)) {
-
+	while (j < ft_strlen(s2))
 		string[i++] = s2[j++];
-	}
 
 	string[i] = '\0';
-
-	return string;
+	return (string);
 }
 
 void free_array(char **array) {
@@ -178,7 +165,7 @@ void free_array(char **array) {
 		return ;
 
 	for (int i = 0; array[i]; i++)
-		free(array[i++]);
-
+		free(array[i]);
+		
 	free(array);
 }
