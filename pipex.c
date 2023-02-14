@@ -8,14 +8,14 @@ void last_free(t_ppx *ppx) {
 
 	while (i < 2)
 		free(ppx->cmd_path[i++]);
-	//gifree(ppx->cmd_path);
+	free(ppx->cmd_path);
 
 	i = 0;
 	while (ppx->cmd_args[i])
 		free_array(ppx->cmd_args[i++]);
-	//free(ppx->cmd_args);
+	free(ppx->cmd_args);
 
-	//free(ppx);
+	free(ppx);
 }
 
 void create_fds(t_ppx *ppx, char *argv[]) {
@@ -84,14 +84,14 @@ void access_check(t_ppx *ppx, char *argv[]) {
         if (accessable == 0) {
 
             printf("%s\n", "Invalid command!");
+        
             free_array(ppx->value_splitted);
 
-            if (i == 0)
-				free_array(ppx->cmd_args[i]);
-            if (i == 1) {
-                while (i >= 0)                
-                    free_array(ppx->cmd_args[i--]);
-            }
+            while (i >= 0)
+				free_array(ppx->cmd_args[i--]);
+            free(ppx->cmd_args);
+
+            free(ppx);
 
             exit(EXIT_FAILURE);
         }
@@ -106,19 +106,8 @@ void execute_cmds(t_ppx *ppx, char *envp[]) {
     if (pipe(end) < 0) {
 
 		printf("%s\n", "Error occurred while creating a pipe");
-
-        free_array(ppx->value_splitted);
-
-        int i = 0;
-        while (i < 2)               
-            free_array(ppx->cmd_args[i++]);
-
-        i = 0;
-        while (i < 2)
-		    free(ppx->cmd_path[i++]);
-
+        last_free(ppx);
 		exit(EXIT_FAILURE);
-
 	}
     
     for (int i = 0; i < 2; i++) {
@@ -149,22 +138,22 @@ void execute_cmds(t_ppx *ppx, char *envp[]) {
 
 int main(int argc, char *argv[], char *envp[]) {
 
-    t_ppx ppx;
+    t_ppx *ppx;
     
     if (argc != 5) {
         printf("%s\n", "Incorrect number of arguments!");
         exit(EXIT_FAILURE);
     }
 
-    //ppx = malloc(sizeof(t_ppx));
-    //ppx->cmd_args = malloc(sizeof(char **) * 3);
-    //ppx->cmd_path = malloc(sizeof(char *) * 3);
+    ppx = malloc(sizeof(t_ppx));
+    ppx->cmd_args = malloc(sizeof(char **) * 3);
+    ppx->cmd_path = malloc(sizeof(char *) * 3);
 
-    create_fds(&ppx, argv);
-    save_path_value(&ppx, envp);
-    access_check(&ppx, argv);
-    execute_cmds(&ppx, envp);
-    last_free(&ppx);
+    create_fds(ppx, argv);
+    save_path_value(ppx, envp);
+    access_check(ppx, argv);
+    execute_cmds(ppx, envp);
+    last_free(ppx);
 
     return 0;
 } 
